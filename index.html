@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troll Ball Clicker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: white;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .admin-toggle {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-toggle:hover {
+            background: #ff3742;
+            transform: translateY(-2px);
+        }
+
+        .admin-content {
+            display: none;
+        }
+
+        .admin-content.show {
+            display: block;
+        }
+
+        .command-row {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .command-row input {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+            font-size: 14px;
+        }
+
+        .command-row button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #2ed573;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .command-row button:hover {
+            background: #1dd162;
+            transform: translateY(-1px);
+        }
+
+        .admin-log {
+            background: rgb(0, 0, 0);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: left;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 100px;
+            overflow-y: auto;
+            color: #00ff04;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: #4ade80;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .shop {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .ball {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .ball:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .ball.affordable {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.2);
+        }
+
+        .ball.expensive {
+            border-color: #f87171;
+            background: rgba(248, 113, 113, 0.2);
+            cursor: not-allowed;
+        }
+
+        .ball.out-of-stock {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .ball.event {
+            border: 3px solid #ff6b6b;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+            animation: eventGlow 2s infinite alternate;
+        }
+
+        @keyframes eventGlow {
+            0% {
+                box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+            }
+            100% {
+                box-shadow: 0 0 25px rgba(255, 107, 107, 0.8);
+            }
+        }
+
+        .ball h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .ball-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .restock-timer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .owned-balls {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .owned-ball {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .crafting-area {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-top: 20px;
+        }
+
+        .craft-recipes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .recipe-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .recipe-card.craftable {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .recipe-card.uncraftable {
+            border-color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .recipe-ingredients {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .craft-button {
+            background: #4ade80;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .craft-button:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        .craft-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ingredient-count {
+            color: #fbbf24;
+            font-size: 12px;
+        }
+
+        .result-ball {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .empty-shop {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .admin-status {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .admin-verified {
+            color: #4ade80;
+        }
+
+        .admin-not-verified {
+            color: #f87171;
+        }
+
+        .packs-area {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-top: 20px;
+        }
+
+        .pack-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .pack-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .pack-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .pack-card.affordable {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.15);
+        }
+
+        .pack-card.expensive {
+            border-color: #f87171;
+            background: rgba(248, 113, 113, 0.15);
+            cursor: not-allowed;
+        }
+
+        .pack-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .pack-info {
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .pack-button {
+            background: linear-gradient(45deg, #4ade80, #22c55e);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .pack-button:hover {
+            background: linear-gradient(45deg, #22c55e, #16a34a);
+            transform: translateY(-2px);
+        }
+
+        .pack-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .pack-opening {
+            background: rgba(0, 0, 0, 0.8);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .pack-animation {
+            margin: 30px 0;
+        }
+
+        .pack-box {
+            font-size: 120px;
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px) rotate(-5deg);
+            }
+
+            75% {
+                transform: translateX(5px) rotate(5deg);
+            }
+        }
+
+        .pack-results {
+            margin: 20px 0;
+            max-width: 600px;
+        }
+
+        .pack-result-ball {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            animation: ballReveal 0.8s ease-out;
+        }
+
+        @keyframes ballReveal {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotateY(180deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+
+        .recent-pulls {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .recent-pull {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0.9;
+        }
+
+        .rarity-common {
+            border: 2px solid #9ca3af;
+        }
+
+        .rarity-uncommon {
+            border: 2px solid #22c55e;
+        }
+
+        .rarity-rare {
+            border: 2px solid #3b82f6;
+        }
+
+        .rarity-epic {
+            border: 2px solid #a855f7;
+        }
+
+        .rarity-legendary {
+            border: 2px solid #f59e0b;
+        }
+
+        .rarity-mythical {
+            border: 2px solid #ef4444;
+            animation: mythicalGlow 2s infinite;
+        }
+
+        @keyframes mythicalGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 5px #ef4444;
+            }
+
+            50% {
+                box-shadow: 0 0 20px #ef4444, 0 0 30px #ef4444;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <h1>🎱 Troll Ball Clicker 🎱</h1>
+
+        <div class="stats">
+            <div id="money">Money: $20</div>
+            <div id="time">Time: 10</div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel">
+            <button class="admin-toggle" onclick="toggleAdmin()">🔧 Admin Panel</button>
+            <div class="admin-content" id="admin-content">
+                <h3>Admin Commands</h3>
+
+                <div class="admin-status" id="admin-status">
+                    <span class="admin-not-verified">❌ Not Verified - Use 'verify' command first</span>
+                </div>
+
+                <div class="command-row">
+                    <span>Password:</span>
+                    <input type="password" id="password-input" placeholder="password (NEEDED)">
+                    <span>Command:</span>
+                    <input type="text" id="command-input"
+                        placeholder="verify | restock | trollball | setcoins | restocktb | clear">
+                    <span>Argument:</span>
+                    <input type="text" id="argument-input" placeholder="argument (if needed)">
+                    <button onclick="executeCommand()">EXECUTE</button>
+                </div>
+
+                <div class="admin-log" id="admin-log">
+                    Admin panel ready...
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('shop')">🛒 Shop</button>
+            <button class="tab-button" onclick="switchTab('packs')">📦 Randoms</button>
+            <button class="tab-button" onclick="switchTab('crafting')">⚒️ Crafting</button>
+            <button class="tab-button" onclick="switchTab('inventory')">🎒 Inventory</button>
+        </div>
+
+        <!-- Shop Tab -->
+        <div id="shop-tab" class="tab-content active">
+            <div class="restock-timer">
+                Next restock in: <span id="restock-timer">10</span>s
+            </div>
+
+            <div id="shop" class="shop">
+                <!-- Balls will appear here -->
+            </div>
+        </div>
+
+        <!-- Trollpacks Tab -->
+        <div id="packs-tab" class="tab-content">
+            <div class="packs-area">
+                <h2>📦 Randoms - Roll for Any Trollball!</h2>
+                <p>Open packs to get trollballs that are in the shop!</p>
+
+                <div class="pack-types" id="pack-types">
+                    <!-- Pack types will appear here -->
+                </div>
+
+                <div class="pack-opening" id="pack-opening" style="display: none;">
+                    <h3>🎁 Opening Pack...</h3>
+                    <div class="pack-animation" id="pack-animation">
+                        <div class="pack-box">📦</div>
+                    </div>
+                    <div class="pack-results" id="pack-results"></div>
+                    <button class="craft-button" onclick="closePackOpening()">Close</button>
+                </div>
+
+                <div class="recent-pulls">
+                    <h3>🎯 Recent Pulls:</h3>
+                    <div id="recent-pulls-list">No recent pulls</div>
+                </div>
+
+                <div id="pack-types">
+                    <h1>pack types:</h1>
+                    <span><h2>trollpack</h2></span><span><h3>you get random trollballs</h3></span>
+                    <span><h2>lucky blocks</h2></span><span><h3>you get a random trollball</h3></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crafting Tab -->
+        <div id="crafting-tab" class="tab-content">
+            <div class="crafting-area">
+                <h2>⚒️ Crafting Station</h2>
+                <p>Combine your balls to create powerful new ones!</p>
+
+                <div class="craft-recipes" id="craft-recipes">
+                    <!-- Craft recipes will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Tab -->
+        <div id="inventory-tab" class="tab-content">
+            <div class="owned-balls">
+                <h3>Owned Balls (generating passive income):</h3>
+                <div id="owned-list">None yet</div>
+            </div>
+        </div>
+    </div>
+    <span>
+        <div>
+            <img alt="sammy", src="sammy.webp", width="50px", height="50px", style="position: fixed; bottom: 20px; right: 20px; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.75);">
+        </div>
+    </span>
+    <script>
+        let time = 0;
+        let money = 15;
+        let restockTimer = 10;
+        let ownedBalls = [];
+        let currentTab = 'shop';
+        let isverifiedadmin = false;
+        let recentPulls = [];
+
+        const packTypes = [
+            {
+                name: "Basic Trollpack",
+                icon: "📦",
+                price: 25,
+                count: 1,
+                description: "1 random trollball",
+                rarityWeights: { common: 50, uncommon: 30, rare: 15, epic: 4, legendary: 1, mythical: 0 }
+            },
+            {
+                name: "Premium Trollpack",
+                icon: "🎁",
+                price: 60,
+                count: 3,
+                description: "3 random trollballs with better odds",
+                rarityWeights: { common: 30, uncommon: 35, rare: 20, epic: 10, legendary: 4, mythical: 1 }
+            },
+            {
+                name: "Legendary Trollpack",
+                icon: "👑",
+                price: 150,
+                count: 5,
+                description: "5 trollballs, guaranteed rare or better",
+                rarityWeights: { common: 0, uncommon: 20, rare: 40, epic: 25, legendary: 12, mythical: 3 }
+            },
+            {
+                name: "Mythical Trollpack",
+                icon: "✨",
+                price: 400,
+                count: 3,
+                description: "3 trollballs, guaranteed epic or better",
+                rarityWeights: { common: 0, uncommon: 0, rare: 0, epic: 60, legendary: 30, mythical: 10 }
+            },
+            {
+                name: "Mega Trollpack",
+                icon: "💎",
+                price: 1000,
+                count: 10,
+                description: "10 random trollballs with excellent odds",
+                rarityWeights: { common: 15, uncommon: 25, rare: 30, epic: 20, legendary: 8, mythical: 2 }
+            },
+            {
+                name: "Rainbow Trollpack",
+                icon: "🌈",
+                price: 2000,
+                count: 12,
+                description: "12 random trollballs, guaranteed legendary or better | 3X VALUE MULTIPLIER!",
+                rarityWeights: { common: 0, uncommon: 0, rare: 0, epic: 50, legendary: 40, mythical: 10 }
+            },
+            {
+                name: "exotic Trollpack",
+                icon: "🚀",
+                price: 5000,
+                count: 15,
+                description: "15 random trollballs, guaranteed mythical or better | 5X VALUE MULTIPLIER!",
+                rarityWeights: { common: 0, uncommon: 0, rare: 0, epic: 30, legendary: 50, mythical: 20 }
+            },
+            {
+                name: "rainbow exotic Trollpack",
+                icon: "🛸",
+                price: 10000,
+                count: 20,
+                description: "20 random trollballs, guaranteed legendary or better | 15X VALUE MULTIPLIER!",
+                rarityWeights: { common: 0, uncommon: 0, rare: 0, epic: 20, legendary: 60, mythical: 20 }
+            },
+            {
+                name: "golden Trollpack",
+                icon: "👑",
+                price: 25000,
+                count: 12,
+                description: "12 random trollballs, guaranteed mythical or better | 7X VALUE MULTIPLIER!",
+                rarityWeights: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 50, mythical: 50 }
+            },
+            {
+                name: "gamble Trollpack",
+                icon: "🎲",
+                price: 50000,
+                count: 5,
+                description: "5 not so random trollballs, common or mythical",
+                rarityWeights: { common: 75, uncommon: 0, rare: 0, epic: 0, legendary: 0, mythical: 25 }
+            },
+            // lucky blocks
+            {
+                name: "basic lucky block",
+                icon: "🟨",
+                price: 100,
+                count: 1,
+                description: "basic lucky block",
+                rarityWeights: { common: 100, uncommon: 0, rare: 0, epic: 0, legendary: 0, mythical: 0 }
+            },
+            {
+                name: "super lucky block",
+                icon: "🟩",
+                price: 500,
+                count: 1,
+                description: "super lucky block",
+                rarityWeights: { common: 0, uncommon: 100, rare: 0, epic: 0, legendary: 0, mythical: 0 }
+            },
+            {
+                name: "supreme lucky block",
+                icon: "🟦",
+                price: 1000,
+                count: 1,
+                description: "supreme lucky block",
+                rarityWeights: { common: 0, uncommon: 0, rare: 85, epic: 15, legendary: 0, mythical: 0 }
+            },
+            {
+                name: "exotic lucky block",
+                icon: "🟪",
+                price: 7500,
+                count: 1,
+                description: "exotic lucky block | 2X VALUE MULTIPLIER!",
+                rarityWeights: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 95, mythical: 5 }
+            },
+            {
+                name: "mythical lucky block",
+                icon: "🟫",
+                price: 20000,
+                count: 1,
+                description: "mythical lucky block | 5X VALUE MULTIPLIER!",
+                rarityWeights: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 10, mythical: 90 }
+            }
+        ];
+
+        const date = new Date()
+        const year = date.getFullYear();
+
+        const trollballs = [
+            { name: "jason", price: 15, value: 10, color: "#ff6b6b", chance: 1 },
+            { name: "otto", price: 20, value: 15, color: "#ff0000", chance: 0.9 },
+            { name: "john", price: 18, value: 12, color: "#ffa500", chance: 0.85 },
+            { name: "blowerguy", price: 10, value: 5, color: "#00ff00", chance: 0.9 },
+            { name: "xo", price: 25, value: 18, color: "#4444ff", chance: 0.7 },
+            { name: "goban", price: 22, value: 16, color: "#2222aa", chance: 0.75 },
+            { name: "darnel", price: 30, value: 22, color: "#8844ff", chance: 0.6 },
+            { name: "loopy", price: 28, value: 20, color: "#00bfff", chance: 0.65 },
+            { name: "bloodington", price: 40, value: 35, color: "#990000", chance: 0.4 },
+            { name: "baller", price: 32, value: 25, color: "#ff4500", chance: 0.5 },
+            { name: "nate", price: 33, value: 26, color: "#ff8c00", chance: 0.48 },
+            { name: "blue", price: 42, value: 38, color: "#0040ff", chance: 0.38 },
+            { name: "frowned", price: 45, value: 40, color: "#8b0000", chance: 0.35 },
+            { name: "glitch", price: 35, value: 28, color: "#800080", chance: 0.5 },
+            { name: "stat1k", price: 38, value: 30, color: "#000000", chance: 0.45 },
+            { name: "archa", price: 27, value: 19, color: "#ffd700", chance: 0.55 },
+            { name: "flitchy", price: 100, value: 57, color: "#ff69b4", chance: 0.25 },
+            { name: "guardian", price: 250, value: 175, color: "#444", chance: 0.18 },
+            { name: "connor", price: 275, value: 180, color: "00fff0", chance: 0.23 },
+            { name: "robot coat", price: 300, value: 200, color: "333", chance: 0.21 },
+            { name: "coolix", price: 350, value: 210, color: "#00ff00", chance: 0.19 },
+            { name: "ewj", price: 400, value: 240, color: "#ffff00", chance: 0.17 },
+            { name: "dr soap", price: 550, value: 275, color: "#ff00ff", chance: 0.16 },
+            { name: "carlos", price: 480, value: 230, color: "#ff8800", chance: 0.21 },
+            { name: "pothead", price: 520, value: 260, color: "#008000", chance: 0.18 },
+            { name: "rizzbot 3000", price: 700, value: 350, color: "#ff0055", chance: 0.14 },
+            { name: "shadow / ayo", price: 800, value: 400, color: "#555555", chance: 0.12 },
+            { name: "razer", price: 900, value: 450, color: "#00ff00", chance: 0.4 },
+            { name: "smol", price: 1030, value: 921, color: "#000000", chance: 0.2 },
+            { name: "mr mario", price: 500, value: 250, color: "#00fcff", chance: 0.2 },
+            { name: "elmo", price: 450, value: 225, color: "#ff0000", chance: 0.22 },
+            { name: "angru", price: 600, value: 300, color: "#ff5555", chance: 0.15 },
+            { name: "pbby glitch", price: year, value: 2**8, color: "#777", chance: 0.12 },
+            { name: "bot", price: 50, value: 45, color: "#808080", chance: 0.3 },
+            { name: "error", price: 27182818, value: 314159, chance: 0.084147, color: "#000000", sound: "glitch.mp3" },
+            { name: "the beyonder", price: 100000, value: 5000, chance: 0.005, color: "#000000", sound: "thebeyonder.wav" },
+            { name: "king Ânton the third", price: 1400000, value: 34000, color: "#ffd700", chance: 0.056, sound: "kinganton.wav" },
+            { name: "los rizzleritos", price: 4000, value: 2000, color: "#00ffcc", chance: 0.05, sound: "losrizzleritos.wav" },
+            { name: "la grandioza altranga imperiesto Loopy", price: 10000, value: 5000, color: "#ff00ff", chance: 0.034, sound: "lgail.wav" },
+            { name: "los trollballitas", price: 1500, value: 1500, color: "#ff69b4", chance: 0.023, sound: "lostrolllballitas.wav" },
+            { name: "la granda trolpilka dio edwardo", price: 1000000, value: 100000, color: "#ff1493", chance: 0.01, sound: "lgtpe.wav" },
+            { name: "absolute XO", price: 1200, value: 750, color: "#1e90ff", chance: 0.08, sound: "absolutexo.wav" },
+            { name: "tripi trumpy", price: 1575, value: 800, color: "#ffdd00", chance: 0.07 },
+            { name: "il grande sconfittore del marciume cerebrale turtlezilla", price: 49999, value: 25000, color: "#32cd32", chance: 0.015, sound: "turtlezilla.wav" },
+            { name: "los madrilitos", price: 3000, value: 1500, color: "#ff4500", chance: 1, special: true, releasedate: "friday", releasetime: "6:00 morning", deletedate: "saturday", deletetime: "10:00 evening", icon: "⚽️" },
+            { name: "████ x █████", price: 5000000, value: 1000000, color: "#000000", chance: 1, special: true, releasedate: "wednesday", releasetime: "12:00 evening", deletedate: "monday", deletetime: "12:00 evening", icon: "⍰" }
+        ];
+
+        const crafts = [
+            {
+                name: "drake & jason jr",
+                ingredients: ["jason", "bot"],
+                price: 60,
+                value: 55,
+                color: "#ff4500",
+                rarity: "rare"
+            },
+            {
+                name: "mega loopy",
+                ingredients: ["loopy", "loopy", "xo"],
+                price: 100,
+                value: 80,
+                color: "#00ffff",
+                rarity: "epic"
+            },
+            {
+                name: "ultimate guardian",
+                ingredients: ["guardian", "bloodington", "glitch"],
+                price: 750,
+                value: 500,
+                color: "#4b0082",
+                rarity: "legendary"
+            },
+            {
+                name: "shadow master",
+                ingredients: ["shadow / ayo", "stat1k", "darnel"],
+                price: 800,
+                value: 650,
+                color: "#2f2f2f",
+                rarity: "legendary"
+            },
+            {
+                name: "cosmic fusion",
+                ingredients: ["the beyonder", "smol", "razer"],
+                price: 42000,
+                value: 12000,
+                color: "#ff00ff",
+                rarity: "mythical"
+            },
+            {
+                name: "troll king supreme",
+                ingredients: ["king Ânton the third", "los trollballitas", "absolute XO"],
+                price: 100000,
+                value: 50000,
+                color: "#ffd700",
+                rarity: "mythical"
+            },
+            {
+                name: "elemental trio",
+                ingredients: ["otto", "blue", "coolix"],
+                price: 600,
+                value: 280,
+                color: "#663399",
+                rarity: "rare"
+            },
+            {
+                name: "doctors experiment",
+                ingredients: ["dr soap", "pothead", "carlos"],
+                price: 777,
+                value: 750,
+                color: "#9932cc",
+                rarity: "epic"
+            },
+            {
+                name: "the rizzler brothers",
+                ingredients: ["jason", "john", "otto"],
+                price: 200,
+                value: 150,
+                color: "#ff6600",
+                rarity: "rare"
+            }
+        ];
+
+        const admins = [
+            "jason",
+            "loopy",
+            "XO",
+            "bot",
+            "coolix",
+            "goban",
+            "ewj",
+            "trump",
+            "frowned"
+        ];
+
+        let currentStock = [];
+
+        // Check if event is currently active based on release/delete dates and times
+        function isEventActive(ball) {
+            if (!ball.special || !ball.releasedate || !ball.releasetime || !ball.deletedate || !ball.deletetime) return true;
+            
+            const now = new Date();
+            const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            const currentHour = now.getHours();
+            
+            // Convert day names to numbers
+            const dayNames = {
+                'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3,
+                'thursday': 4, 'friday': 5, 'saturday': 6
+            };
+            
+            const releaseDay = dayNames[ball.releasedate.toLowerCase()];
+            const deleteDay = dayNames[ball.deletedate.toLowerCase()];
+            
+            // Parse release time
+            const releaseTimeMatch = ball.releasetime.match(/(\d{1,2}):(\d{2})\s*(morning|evening)/i);
+            if (!releaseTimeMatch) return false;
+            
+            let releaseHour = parseInt(releaseTimeMatch[1]);
+            const releaseMinute = parseInt(releaseTimeMatch[2]);
+            const releasePeriod = releaseTimeMatch[3].toLowerCase();
+            
+            // Convert to 24-hour format
+            if (releasePeriod === 'evening' && releaseHour !== 12) {
+                releaseHour += 12;
+            } else if (releasePeriod === 'morning' && releaseHour === 12) {
+                releaseHour = 0;
+            }
+            
+            // Parse delete time
+            const deleteTimeMatch = ball.deletetime.match(/(\d{1,2}):(\d{2})\s*(morning|evening)/i);
+            if (!deleteTimeMatch) return false;
+            
+            let deleteHour = parseInt(deleteTimeMatch[1]);
+            const deleteMinute = parseInt(deleteTimeMatch[2]);
+            const deletePeriod = deleteTimeMatch[3].toLowerCase();
+            
+            // Convert to 24-hour format
+            if (deletePeriod === 'evening' && deleteHour !== 12) {
+                deleteHour += 12;
+            } else if (deletePeriod === 'morning' && deleteHour === 12) {
+                deleteHour = 0;
+            }
+            
+            // Check if current time is within the active period
+            const currentTime = currentHour * 60 + now.getMinutes();
+            const releaseTime = releaseHour * 60 + releaseMinute;
+            const deleteTime = deleteHour * 60 + deleteMinute;
+            
+            // Handle single day events
+            if (releaseDay === deleteDay) {
+                return currentDay === releaseDay && currentTime >= releaseTime && currentTime <= deleteTime;
+            }
+            
+            // Handle multi-day events
+            if (currentDay === releaseDay) {
+                return currentTime >= releaseTime;
+            } else if (currentDay === deleteDay) {
+                return currentTime <= deleteTime;
+            } else if (releaseDay < deleteDay) {
+                return currentDay > releaseDay && currentDay < deleteDay;
+            } else {
+                // Handle week wrap-around (e.g., Saturday to Monday)
+                return currentDay > releaseDay || currentDay < deleteDay;
+            }
+        }
+
+        // Assign rarities to trollballs based on their chance values
+        function getTrollballRarity(ball) {
+            if (ball.chance >= 0.7) return 'common';
+            if (ball.chance >= 0.4) return 'uncommon';
+            if (ball.chance >= 0.2) return 'rare';
+            if (ball.chance >= 0.1) return 'epic';
+            if (ball.chance >= 0.05) return 'legendary';
+            return 'mythical';
+        }
+
+        function getTrollballsByRarity(rarity) {
+            return trollballs.filter(ball => getTrollballRarity(ball) === rarity);
+        }
+
+        function getRandomTrollballByRarity(rarity) {
+            const ballsOfRarity = getTrollballsByRarity(rarity);
+            return ballsOfRarity[Math.floor(Math.random() * ballsOfRarity.length)];
+        }
+
+        function rollPackRarity(weights) {
+            const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
+            let random = Math.random() * totalWeight;
+
+            for (const [rarity, weight] of Object.entries(weights)) {
+                random -= weight;
+                if (random <= 0) return rarity;
+            }
+            return 'common';
+        }
+
+        function displayPacks() {
+            const packsContainer = document.getElementById('pack-types');
+            packsContainer.innerHTML = '';
+
+            packTypes.forEach(pack => {
+                const canAfford = money >= pack.price;
+
+                const packCard = document.createElement('div');
+                packCard.className = `pack-card ${canAfford ? 'affordable' : 'expensive'}`;
+
+                packCard.innerHTML = `
+                    <span class="pack-icon">${pack.icon}</span>
+                    <h3>${pack.name}</h3>
+                    <div class="pack-info">
+                        ${pack.description}<br>
+                        <strong>Price: ${pack.price}</strong>
+                    </div>
+                    <button class="pack-button" ${!canAfford ? 'disabled' : ''} onclick="openPack('${pack.name}')">
+                        ${canAfford ? `Open Pack - ${pack.price}` : `Need ${pack.price - money} more`}
+                    </button>
+                `;
+
+                packsContainer.appendChild(packCard);
+            });
+        }
+
+        function openPack(packName) {
+            const pack = packTypes.find(p => p.name === packName);
+            if (!pack || money < pack.price) return;
+
+            money -= pack.price;
+
+            // Show pack opening animation
+            const packOpening = document.getElementById('pack-opening');
+            const packResults = document.getElementById('pack-results');
+            const packAnimation = document.getElementById('pack-animation');
+
+            packOpening.style.display = 'flex';
+            packResults.innerHTML = '';
+            packAnimation.innerHTML = '<div class="pack-box">📦</div>';
+
+            // Determine value multiplier based on pack type
+            let valueMultiplier = 1;
+            if (packName === "rainbow exotic Trollpack") {
+                valueMultiplier = 15;
+            } else if (packName === "exotic Trollpack") {
+                valueMultiplier = 5;
+            } else if (packName === "Rainbow Trollpack") {
+                valueMultiplier = 3;
+            } else if (packName === "golden Trollpack") {
+                valueMultiplier = 7;
+            } else if (packName === "exotic lucky block") {
+                valueMultiplier = 2;
+            } else if (packName === "mythical lucky block") {
+                valueMultiplier = 5;
+            }
+
+            // Animate for 2 seconds, then show results
+            setTimeout(() => {
+                const pulledBalls = [];
+
+                for (let i = 0; i < pack.count; i++) {
+                    const rarity = rollPackRarity(pack.rarityWeights);
+                    const ball = getRandomTrollballByRarity(rarity);
+                    if (ball) {
+                        // Apply value multiplier to the ball
+                        const enhancedBall = {
+                            ...ball,
+                            rarity,
+                            value: ball.value * valueMultiplier,
+                            fromPack: packName,
+                            multiplier: valueMultiplier
+                        };
+                        pulledBalls.push(enhancedBall);
+                        ownedBalls.push(enhancedBall);
+                    }
+                }
+
+                // Display results
+                packAnimation.innerHTML = '<div class="pack-box">🎁</div>';
+                pulledBalls.forEach((ball, index) => {
+                    setTimeout(() => {
+                        const ballDiv = document.createElement('div');
+                        ballDiv.className = `pack-result-ball rarity-${ball.rarity}`;
+                        ballDiv.style.backgroundColor = ball.color;
+                        const multiplierText = ball.multiplier > 1 ? ` (${ball.multiplier}X VALUE!)` : '';
+                        ballDiv.innerHTML = `
+                            ${ball.name}${multiplierText}<br>
+                            <small>+${ball.value}/s | ${ball.rarity.toUpperCase()}</small>
+                        `;
+                        packResults.appendChild(ballDiv);
+
+                        if (ball.sound) {
+                            playSound(ball.sound);
+                        }
+                    }, index * 300);
+                });
+
+                // Add to recent pulls
+                pulledBalls.forEach(ball => {
+                    recentPulls.unshift(ball);
+                    if (recentPulls.length > 20) recentPulls.pop();
+                });
+
+                const multiplierInfo = valueMultiplier > 1 ? ` (${valueMultiplier}X VALUE)` : '';
+                logAdmin(`Opened ${pack.name}${multiplierInfo}: ${pulledBalls.map(b => b.name).join(', ')}`);
+                updateText();
+                updateRecentPulls();
+
+            }, 2000);
+        }
+
+        function closePackOpening() {
+            document.getElementById('pack-opening').style.display = 'none';
+        }
+
+        function updateRecentPulls() {
+            const recentPullsList = document.getElementById('recent-pulls-list');
+            if (recentPulls.length === 0) {
+                recentPullsList.innerHTML = 'No recent pulls';
+                return;
+            }
+
+            recentPullsList.innerHTML = '';
+            recentPulls.slice(0, 10).forEach(ball => {
+                const pullDiv = document.createElement('span');
+                pullDiv.className = `recent-pull rarity-${ball.rarity}`;
+                pullDiv.style.backgroundColor = ball.color;
+                pullDiv.textContent = ball.name;
+                pullDiv.title = `${ball.rarity.toUpperCase()} - +${ball.value}/s`;
+                recentPullsList.appendChild(pullDiv);
+            });
+        }
+
+        // Update admin status display
+        function updateAdminStatus() {
+            const statusElement = document.getElementById('admin-status');
+            if (isverifiedadmin) {
+                statusElement.innerHTML = '<span class="admin-verified">✅ Admin Verified - Commands enabled</span>';
+            } else {
+                statusElement.innerHTML = '<span class="admin-not-verified">❌ Not Verified - Use \'verify\' command first</span>';
+            }
+        }
+
+        // Tab Functions
+        function switchTab(tabName) {
+            currentTab = tabName;
+
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content and activate button
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.target.classList.add('active');
+
+            // Update displays
+            if (tabName === 'crafting') {
+                displayCraftingRecipes();
+            } else if (tabName === 'inventory') {
+                updateOwnedDisplay();
+            } else if (tabName === 'packs') {
+                displayPacks();
+                updateRecentPulls();
+            }
+        }
+
+        // Crafting Functions
+        function displayCraftingRecipes() {
+            const recipesContainer = document.getElementById('craft-recipes');
+            recipesContainer.innerHTML = '';
+
+            crafts.forEach(recipe => {
+                const canCraft = canCraftRecipe(recipe);
+                const canAfford = money >= recipe.price;
+                const canCraftAndAfford = canCraft && canAfford;
+
+                const recipeCard = document.createElement('div');
+                recipeCard.className = `recipe-card ${canCraftAndAfford ? 'craftable' : 'uncraftable'}`;
+
+                const rarityEmoji = {
+                    'rare': '💎',
+                    'epic': '⭐',
+                    'legendary': '👑',
+                    'mythical': '✨'
+                };
+
+                const ingredientsHTML = recipe.ingredients.map(ingredient => {
+                    const ownedCount = countOwnedBalls(ingredient);
+                    const needed = recipe.ingredients.filter(ing => ing === ingredient).length;
+                    return `<span style="color: ${ownedCount >= needed ? '#4ade80' : '#f87171'}">${ingredient} <span class="ingredient-count">(${ownedCount}/${needed})</span></span>`;
+                }).join(' + ');
+
+                let buttonText = 'CRAFT!';
+                if (!canCraft) buttonText = 'Need More Materials';
+                else if (!canAfford) buttonText = `Need ${recipe.price - money} More`;
+
+                recipeCard.innerHTML = `
+                    <h3>${rarityEmoji[recipe.rarity] || '⚡'} ${recipe.name}</h3>
+                    <div class="recipe-ingredients">${ingredientsHTML}</div>
+                    <div class="result-ball" style="background-color: ${recipe.color}">
+                        Result: +${recipe.value}/s | Cost: ${recipe.price}
+                    </div>
+                    <button class="craft-button" ${!canCraftAndAfford ? 'disabled' : ''} onclick="craftItem('${recipe.name}')">
+                        ${buttonText}
+                    </button>
+                `;
+
+                recipesContainer.appendChild(recipeCard);
+            });
+        }
+
+        function canCraftRecipe(recipe) {
+            const requiredIngredients = {};
+            recipe.ingredients.forEach(ingredient => {
+                requiredIngredients[ingredient] = (requiredIngredients[ingredient] || 0) + 1;
+            });
+
+            for (const [ingredient, needed] of Object.entries(requiredIngredients)) {
+                if (countOwnedBalls(ingredient) < needed) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function countOwnedBalls(ballName) {
+            return ownedBalls.filter(ball => ball.name.toLowerCase() === ballName.toLowerCase()).length;
+        }
+
+        function craftItem(recipeName) {
+            const recipe = crafts.find(r => r.name === recipeName);
+            if (!recipe || !canCraftRecipe(recipe) || money < recipe.price) {
+                return;
+            }
+
+            money -= recipe.price;
+
+            // Remove ingredients from inventory
+            const requiredIngredients = {};
+            recipe.ingredients.forEach(ingredient => {
+                requiredIngredients[ingredient] = (requiredIngredients[ingredient] || 0) + 1;
+            });
+
+            for (const [ingredient, needed] of Object.entries(requiredIngredients)) {
+                for (let i = 0; i < needed; i++) {
+                    const index = ownedBalls.findIndex(ball => ball.name.toLowerCase() === ingredient.toLowerCase());
+                    if (index !== -1) {
+                        ownedBalls.splice(index, 1);
+                    }
+                }
+            }
+
+            // Add crafted item
+            const craftedBall = {
+                name: recipe.name,
+                price: recipe.price,
+                value: recipe.value,
+                color: recipe.color,
+                crafted: true
+            };
+
+            ownedBalls.push(craftedBall);
+
+            // Play success sound or effect
+            if (recipe.sound) {
+                playSound(recipe.sound);
+            }
+
+            logAdmin(`Crafted ${recipe.name} (+${recipe.value}/s) for ${recipe.price}`);
+            updateText();
+            displayCraftingRecipes();
+        }
+
+        // Admin Functions
+        function toggleAdmin() {
+            const content = document.getElementById('admin-content');
+            content.classList.toggle('show');
+        }
+
+        function logAdmin(message) {
+            const log = document.getElementById('admin-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const datestamp = new Date().toLocaleDateString()
+            log.innerHTML += `<div>[${timestamp}, ${datestamp}] - ${message} -</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function executeCommand() {
+            const commandInput = document.getElementById('command-input');
+            const argumentInput = document.getElementById('argument-input');
+            const passwordInput = document.getElementById('password-input');
+            const command = commandInput.value.toLowerCase().trim();
+            const argument = argumentInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            logAdmin(`Executing: ${command} ${argument}`);
+
+            // Handle verify command separately - always allowed
+            if (command === 'verify') {
+                if (admins.includes(password)) {
+                    isverifiedadmin = true;
+                    logAdmin("✅ Admin verified successfully.");
+                    updateAdminStatus();
+                } else {
+                    isverifiedadmin = false;
+                    logAdmin("❌ Invalid password. Access denied.");
+                    updateAdminStatus();
+                }
+                // Clear inputs
+                commandInput.value = '';
+                argumentInput.value = '';
+                return;
+            }
+
+            // All other commands require verification
+            if (!isverifiedadmin) {
+                logAdmin("❌ ERROR: Admin verification required. Use 'verify' command first.");
+                return;
+            }
+
+            // Execute verified admin commands
+            switch (command) {
+                case 'restock':
+                    adminRestock();
+                    break;
+
+                case 'trollball':
+                    if (!argument) {
+                        logAdmin("ERROR: trollball command requires argument (trollball name)");
+                        return;
+                    }
+                    adminAddTrollball(argument);
+                    break;
+
+                case 'setcoins':
+                    if (!argument) {
+                        logAdmin("ERROR: setcoins command requires argument (number)");
+                        return;
+                    }
+                    adminSetCoins(parseInt(argument));
+                    break;
+
+                case 'restocktb':
+                    if (!argument) {
+                        logAdmin("ERROR: restocktb command requires argument (trollball name)");
+                        return;
+                    }
+                    adminRestockTrollball(argument);
+                    break;
+
+                case 'clear':
+                    adminClearOwned();
+                    break;
+
+                case 'commands':
+                    logAdmin("Available commands: verify, restock, trollball <name>, setcoins <amount>, restocktb <name>, clear");
+                    break;
+                case 'currenttbs':
+                    logAdmin(`Current Stock: ${currentStock.map(b => b.name).join(', \n')}`);
+                    break;
+                case 'alltbs':
+                    logAdmin(`All Trollballs: ${trollballs.map(b => b.name).join(', \n')}`);
+                    break;
+                default:
+                    logAdmin(`ERROR: Unknown command "${command}". Type 'commands' for help.`);
+                    return;
+            }
+
+            // Clear inputs after successful command
+            commandInput.value = '';
+            argumentInput.value = '';
+        }
+
+        // Add Enter key support
+        document.addEventListener('DOMContentLoaded', function () {
+            const commandInput = document.getElementById('command-input');
+            const argumentInput = document.getElementById('argument-input');
+            const passwordInput = document.getElementById('password-input');
+
+            [commandInput, argumentInput, passwordInput].forEach(input => {
+                input.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        executeCommand();
+                    }
+                });
+            });
+        });
+
+        function adminRestock() {
+            restockShop();
+            restockTimer = 10;
+            logAdmin("✅ Shop restocked manually");
+            updateText();
+        }
+
+        function adminRestockTrollball(ballName) {
+            const name = ballName.toLowerCase().trim();
+
+            if (!name) {
+                logAdmin("ERROR: Please enter a trollball name");
+                return;
+            }
+
+            const ball = trollballs.find(b => b.name.toLowerCase() === name);
+            if (!ball) {
+                logAdmin(`ERROR: Trollball "${name}" not found`);
+                return;
+            }
+
+            // Check if the ball is already in stock
+            const alreadyInStock = currentStock.some(stockBall => stockBall.name.toLowerCase() === name);
+
+            if (alreadyInStock) {
+                logAdmin(`${ball.name} is already in stock`);
+                return;
+            }
+
+            // Add the specific ball to current stock
+            currentStock.push(ball);
+            logAdmin(`✅ ${ball.name} has been restocked and added to shop`);
+            displayShop();
+        }
+
+        function adminAddTrollball(ballName) {
+            const name = ballName.toLowerCase().trim();
+
+            if (!name) {
+                logAdmin("ERROR: Please enter a trollball name");
+                return;
+            }
+
+            const ball = trollballs.find(b => b.name.toLowerCase() === name);
+            if (!ball) {
+                logAdmin(`ERROR: Trollball "${name}" not found`);
+                return;
+            }
+
+            ownedBalls.push({ ...ball });
+            logAdmin(`✅ Added ${ball.name} to inventory (+${ball.value}/s)`);
+            updateText();
+        }
+
+        function adminSetCoins(amount) {
+            if (isNaN(amount)) {
+                logAdmin("ERROR: Please enter a valid number");
+                return;
+            }
+
+            const oldMoney = money;
+            money = amount;
+            logAdmin(`✅ Set coins from ${oldMoney} to ${money}`);
+            updateText();
+        }
+
+        function adminClearOwned() {
+            const count = ownedBalls.length;
+            ownedBalls = [];
+            logAdmin(`✅ Cleared ${count} owned trollballs`);
+            updateText();
+        }
+
+        // Existing Functions
+        function playSound(soundFile) {
+            try {
+                const audio = new Audio(soundFile);
+                audio.volume = 0.5;
+                audio.play().catch(error => {
+                    console.log("Could not play sound:", error);
+                });
+            } catch (error) {
+                console.log("Audio not supported or file not found:", error);
+            }
+        }
+
+        function updateText() {
+            document.getElementById("time").innerText = `Time: ${time}`;
+            document.getElementById("money").innerText = `Money: ${money}`;
+            document.getElementById("restock-timer").innerText = restockTimer;
+            updateOwnedDisplay();
+        }
+
+        function updateOwnedDisplay() {
+            const ownedList = document.getElementById("owned-list");
+            if (ownedBalls.length === 0) {
+                ownedList.innerText = "None yet";
+            } else {
+                ownedList.innerHTML = "";
+                const ballGroups = {};
+
+                ownedBalls.forEach(ball => {
+                    const key = `${ball.name}_${ball.multiplier || 1}_${ball.crafted ? 'crafted' : 'normal'}`;
+                    if (!ballGroups[key]) {
+                        ballGroups[key] = {
+                            ball: ball,
+                            count: 0
+                        };
+                    }
+                    ballGroups[key].count++;
+                });
+
+                Object.entries(ballGroups).forEach(([key, group]) => {
+                    const ball = group.ball;
+                    const count = group.count;
+                    const span = document.createElement("span");
+                    span.className = "owned-ball";
+                    span.style.backgroundColor = ball.color;
+
+                    const baseSellPrice = Math.floor(ball.price * 0.85);
+                    const enhancedSellPrice = ball.multiplier ? Math.floor(baseSellPrice * ball.multiplier) : baseSellPrice;
+
+                    const multiplierText = ball.multiplier && ball.multiplier > 1 ? ` [${ball.multiplier}X]` : '';
+                    const eventText = ball.special ? ' [EVENT]' : '';
+                    span.innerText = `${ball.name}${eventText}${multiplierText} x${count} (+${ball.value * count}/s)`;
+
+                    span.title = `Click to sell one for ${enhancedSellPrice}`;
+                    span.style.cursor = "pointer";
+
+                    // Special styling for enhanced balls
+                    if (ball.multiplier && ball.multiplier > 1) {
+                        span.style.border = "2px solid #ff6b6b";
+                        span.title += ` [${ball.multiplier}X VALUE]`;
+                    }
+
+                    // Special styling for crafted items
+                    if (ball.crafted) {
+                        span.style.border = "2px solid gold";
+                        span.title += " [CRAFTED]";
+                    }
+
+                    span.addEventListener("click", () => {
+                        const index = ownedBalls.findIndex(b =>
+                            b.name === ball.name &&
+                            (b.multiplier || 1) === (ball.multiplier || 1) &&
+                            (b.crafted || false) === (ball.crafted || false)
+                        );
+                        if (index !== -1) {
+                            ownedBalls.splice(index, 1);
+                            money += enhancedSellPrice;
+                            const statusText = [
+                                ball.multiplier && ball.multiplier > 1 ? `[${ball.multiplier}X]` : '',
+                                ball.crafted ? "[CRAFTED]" : ''
+                            ].filter(Boolean).join(' ');
+                            logAdmin(`Sold ${ball.name} ${statusText} for ${enhancedSellPrice}`);
+                            updateText();
+                        }
+                    });
+
+                    ownedList.appendChild(span);
+                });
+            }
+        }
+
+        function displayShop() {
+            const shop = document.getElementById("shop");
+            shop.innerHTML = "";
+
+            if (currentStock.length === 0) {
+                const emptyDiv = document.createElement("div");
+                emptyDiv.className = "empty-shop";
+                emptyDiv.innerHTML = "Shop is empty! Wait for restock...";
+                shop.appendChild(emptyDiv);
+                return;
+            }
+
+            currentStock.forEach((ball) => {
+                const div = document.createElement("div");
+                div.className = "ball";
+
+                const canAfford = money >= ball.price;
+                div.classList.add(canAfford ? "affordable" : "expensive");
+                
+                if (ball.special) {
+                    div.classList.add("event");
+                }
+
+                const eventInfo = ball.special && ball.releasedate && ball.releasetime && ball.deletedate && ball.deletetime 
+                    ? `Available: ${ball.releasedate} ${ball.releasetime} to ${ball.deletedate} ${ball.deletetime}<br>` 
+                    : "";
+
+                div.innerHTML = `
+                    <h2>${ball.name}${ball.special ? " [EVENT]" : ""}${ball.chance <= 0.1 ? " [MYTHICAL ❖]" : ""} ${ball.icon ? "[ " + ball.icon + " ]" : ""}</h2>
+                    <div class="ball-info">
+                        Price: ${ball.price}<br>
+                        Value: +${ball.value}/s<br>
+                        Chance: ${(ball.chance * 100).toFixed(1)}%<br>
+                        ${ball.special ? "Limited Time Event Ball!<br>" : ""}
+                        ${eventInfo}
+                        ${canAfford ? "Click to buy!" : "Need more money"}
+                    </div>
+                `;
+
+                div.style.backgroundColor = ball.color;
+
+                if (canAfford) {
+                    div.addEventListener("click", () => {
+                        if (money >= ball.price) {
+                            money -= ball.price;
+                            ownedBalls.push({ ...ball });
+
+                            if (ball.sound) {
+                                playSound(ball.sound);
+                            }
+
+                            const index = currentStock.indexOf(ball);
+                            currentStock.splice(index, 1);
+
+                            updateText();
+                            displayShop();
+                        }
+                    });
+                }
+
+                shop.appendChild(div);
+            });
+        }
+
+        function restockShop() {
+            currentStock = [];
+            trollballs.forEach((ball) => {
+                // Check if it's an event ball and if the event is active
+                if (ball.special && !isEventActive(ball)) {
+                    return; // Skip this ball if it's not event time
+                }
+                
+                // If it's an event ball and event is active, always include it
+                const effectiveChance = (ball.special && isEventActive(ball)) ? 1 : ball.chance;
+                
+                if (Math.random() < effectiveChance) {
+                    currentStock.push(ball);
+                }
+            });
+            displayShop();
+        }
+
+        // Game timers
+        setInterval(() => {
+            time++;
+            restockTimer--;
+
+            if (restockTimer <= 0) {
+                restockTimer = 10;
+                restockShop();
+            }
+
+            updateText();
+        }, 1000);
+
+        // Passive income
+        setInterval(() => {
+            ownedBalls.forEach(ball => {
+                money += ball.value;
+            });
+            updateText();
+        }, 1000);
+
+        // Update displays frequently
+        setInterval(() => {
+            if (currentTab === 'shop') {
+                displayShop();
+            } else if (currentTab === 'crafting') {
+                displayCraftingRecipes();
+            } else if (currentTab === 'packs') {
+                displayPacks();
+            }
+        }, 100);
+
+        // Initial setup
+
+        restockShop();
+        updateText();
+        updateAdminStatus();
+        logAdmin("Game initialized successfully");
+        logAdmin("Type 'verify' command with your admin name as password");
+        if (Math.random() <= 0.01) logAdmin("the ██████████ is real.")
+    </script>
+</body>
+</html>
