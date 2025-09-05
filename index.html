@@ -1355,7 +1355,7 @@
                     adminRestock();
                     break;
 
-                case 'trollball':
+                case 'fakebuy':
                     if (!argument) {
                         logAdmin("ERROR: trollball command requires argument (trollball name)");
                         return;
@@ -1447,9 +1447,20 @@
             }
 
             // Add the specific ball to current stock
-            currentStock.push(ball);
-            logAdmin(`✅ ${ball.name} has been restocked and added to shop`);
-            displayShop();
+            if (money < ball.price) {
+                let remainingmoney = (ball.price - money);
+                currentStock.push(ball);
+                const debt = ball.price - money;
+                logAdmin(`✅ ${ball.name} has been restocked and added to shop, had no money so added ${debt} debt [${money} + ${ball.price} = ${money + ball.price}]`);
+                displayShop();
+                updateText();
+                money += remainingmoney;
+            } else {
+                currentStock.push(ball);
+                logAdmin(`✅ ${ball.name} has been restocked and added to shop`);
+                displayShop();
+                updateText();
+            }
         }
 
         function adminAddTrollball(ballName) {
